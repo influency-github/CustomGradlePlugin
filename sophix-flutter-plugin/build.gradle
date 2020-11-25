@@ -1,6 +1,5 @@
-apply plugin: 'maven'
 apply plugin: 'com.android.library'
-//apply plugin: 'groovy'
+//apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 30
@@ -25,27 +24,16 @@ android {
 }
 
 dependencies {
-//    implementation fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly files('libs/flutter.jar')
     implementation 'androidx.appcompat:appcompat:1.2.0'
     testImplementation 'junit:junit:4.12'
 }
-
-//group = 'com.fengyuncx.influency.plugin.flutter'
-//version = '1.0.0'
-
-uploadArchives{
-    repositories.mavenDeployer{
-            //commit jar to remote repos.
-//            repository(url: "http://xxx.com/repos"){
-//                authentication(userName: "admin",password: "admin")
-//            }
-            //publish to local maven repos.
-            def repoUrl = "file:\\\\" + rootDir + "\\..\\repo"
-            pom.groupId = 'com.fengyuncx.influency.plugin.flutter'
-            pom.artifactId = 'sophix-flutter-plugin'
-            pom.version = '1.0.0'
-            repository(url: repoUrl)
-
-    }
-}
+////添加
+//publish {
+//    userOrg = 'influency'
+//    groupId = 'com.fengyuncx.influency.plugin.flutter'
+//    artifactId = 'sophix-flutter-plugin'
+//    publishVersion = '1.0.0'
+//    desc = 'a android library which will be used with injecting into sophix call with flutter engine.'
+//    website = 'https://github.com/influency-github/CustomGradlePlugin/tree/master/sophix-plugin'
+//}
