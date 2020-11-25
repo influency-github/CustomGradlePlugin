@@ -1,0 +1,2 @@
+include  ':sophix-plugin', ':sophix-flutter-plugin'
+rootProject.name='GradleCustomPlugin'
