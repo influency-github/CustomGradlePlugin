@@ -1,6 +1,12 @@
-apply plugin: 'groovy'
-apply plugin: 'maven'
+//def localProperties = new Properties()
+//def localPropertiesFile = rootProject.file('local.properties')
+//if (localPropertiesFile.exists()) {
+//    localPropertiesFile.withReader('UTF-8') { reader ->
+//        localProperties.load(reader)
+//    }
+//}
 
+apply plugin: 'groovy'
 dependencies {
     implementation gradleApi()
     implementation localGroovy()
@@ -8,20 +14,20 @@ dependencies {
     implementation 'org.ow2.asm:asm-commons:7.0'
     implementation 'com.android.tools.build:gradle:3.5.0'
 }
+//apply plugin: 'com.novoda.bintray-release'
+//publish {
+//    userOrg = localProperties.getProperty('bintray.user')
+//    bintrayUser = localProperties.getProperty('bintray.user')
+//    bintrayKey = localProperties.getProperty('bintray.apiKey')
+//    repoName = 'maven'//repository
+//    uploadName = 'sophix-plugin'//package
+//    groupId = 'com.fengyuncx.influency.plugin'
+//    artifactId = 'sophix-plugin'
+//    publishVersion = '1.0.2'
+//    desc = 'a gradle plugin for code tramsform which would inject vital bytecode into .class files that will be used in sophix with flutter engine.'
+//    website = 'https://github.com/influency-github/CustomGradlePlugin'
+//    autoPublish = true
+//    dryRun = false
+//}
 
-group = 'com.fengyuncx.influency.plugin'
-version = '1.0.0'
-
-uploadArchives{
-    repositories {
-        mavenDeployer{
-            //commit jar to remote repos.
-//            repository(url: "http://xxx.com/repos"){
-//                authentication(userName: "admin",password: "admin")
-//            }
-            //publish to local maven repos.
-            repository(url: uri("D:\\flutterWorkBench\\repo"))
-        }
-    }
-}
 

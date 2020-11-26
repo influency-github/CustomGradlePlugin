@@ -19,3 +19,6 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+##add rules below for the plugin:
+-keep class com.fengyuncx.influency.plugin.flutter.FlutterPatch**{*;}
