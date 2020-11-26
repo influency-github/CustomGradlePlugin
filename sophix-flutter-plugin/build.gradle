@@ -1,10 +1,10 @@
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
-}
+//def localProperties = new Properties()
+//def localPropertiesFile = rootProject.file('local.properties')
+//if (localPropertiesFile.exists()) {
+//    localPropertiesFile.withReader('UTF-8') { reader ->
+//        localProperties.load(reader)
+//    }
+//}
 
 apply plugin: 'com.android.library'
 android {
@@ -34,18 +34,18 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     testImplementation 'junit:junit:4.12'
 }
-apply plugin: 'com.novoda.bintray-release'
-publish {
-    userOrg = localProperties.getProperty('bintray.user')
-    bintrayUser = localProperties.getProperty('bintray.user')
-    bintrayKey = localProperties.getProperty('bintray.apiKey')
-    repoName = 'maven'//repository
-    uploadName = 'sophix-flutter-plugin'//package
-    groupId = 'com.fengyuncx.influency.plugin.flutter'
-    artifactId = 'sophix-flutter-plugin'
-    publishVersion = '1.0.1'
-    desc = 'a android library which will be used with injecting into sophix call with flutter engine.'
-    website = 'https://github.com/influency-github/CustomGradlePlugin'
-    autoPublish = true
-    dryRun = false
-}
+//apply plugin: 'com.novoda.bintray-release'
+//publish {
+//    userOrg = localProperties.getProperty('bintray.user')
+//    bintrayUser = localProperties.getProperty('bintray.user')
+//    bintrayKey = localProperties.getProperty('bintray.apiKey')
+//    repoName = 'maven'//repository
+//    uploadName = 'sophix-flutter-plugin'//package
+//    groupId = 'com.fengyuncx.influency.plugin.flutter'
+//    artifactId = 'sophix-flutter-plugin'
+//    publishVersion = '1.0.1'
+//    desc = 'a android library which will be used with injecting into sophix call with flutter engine.'
+//    website = 'https://github.com/influency-github/CustomGradlePlugin'
+//    autoPublish = true
+//    dryRun = false
+//}

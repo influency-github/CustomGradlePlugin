@@ -1,4 +1,3 @@
-
 package com.fengyuncx.influency.plugin.sophix
 
 import com.android.build.api.transform.DirectoryInput
@@ -27,7 +26,7 @@ import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
 
-class SophixPlugin extends Transform implements Plugin<Project>{
+class SophixPlugin extends Transform implements Plugin<Project> {
     boolean isDebug = true
     String hotfixPluginName = "sophix"
 
@@ -43,7 +42,7 @@ class SophixPlugin extends Transform implements Plugin<Project>{
 
     @Override
     Set<? super QualifiedContent.Scope> getScopes() {
-        return TransformManager.SCOPE_FULL_PROJECT_WITH_LOCAL_JARS
+        return TransformManager.SCOPE_FULL_PROJECT
     }
 
     @Override
@@ -52,6 +51,7 @@ class SophixPlugin extends Transform implements Plugin<Project>{
     }
 
     Project mProject
+
     @Override
     void apply(Project project) {
         mProject = project;
@@ -66,94 +66,94 @@ class SophixPlugin extends Transform implements Plugin<Project>{
             println('#############load influencySophix success#########')
             isDebug = project.extensions.influencySophix.isDebug
             hotfixPluginName = project.extensions.influencySophix.hotfixPluginName
-            if (isDebug){
-                println("influencySophix debug ${isDebug?"on":"off"}. hotfixPluginName: ${hotfixPluginName}")
+            if (isDebug) {
+                println("influencySophix debug ${isDebug ? "on" : "off"}. hotfixPluginName: ${hotfixPluginName}")
             }
         }
     }
 
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
-        if(isDebug){
+        if (isDebug) {
             println("---------SophixPlugin visit start------------------")
         }
         def startTime = System.currentTimeMillis()
         Collection<TransformInput> inputs = transformInvocation.inputs
         TransformOutputProvider outputProvider = transformInvocation.outputProvider
         //delete last output code third:
-        if(outputProvider!=null){
+        if (outputProvider != null) {
             outputProvider.deleteAll()
         }
-        inputs.each {TransformInput transformInput->
+        inputs.each { TransformInput transformInput ->
             //handle class file in dir fourth:
-            transformInput.directoryInputs.each { DirectoryInput dirInput->
-                handleDirInput(dirInput,outputProvider)
+            transformInput.directoryInputs.each { DirectoryInput dirInput ->
+                handleDirInput(dirInput, outputProvider)
             }
             //handle class file in jar fifth:
-            transformInput.jarInputs.each { JarInput jarInput->
-                handleJarInput(jarInput,outputProvider)
+            transformInput.jarInputs.each { JarInput jarInput ->
+                handleJarInput(jarInput, outputProvider)
             }
         }
-        if(isDebug){
-            println("SophixPlugin cost: ${(System.currentTimeMillis()-startTime)/1000}s")
+        if (isDebug) {
+            println("SophixPlugin cost: ${(System.currentTimeMillis() - startTime) / 1000}s")
             println("---------SophixPlugin visit end---------------------")
         }
     }
 
-    void handleDirInput(DirectoryInput dirInput,TransformOutputProvider outputProvider){
+    void handleDirInput(DirectoryInput dirInput, TransformOutputProvider outputProvider) {
 
-        if(dirInput.file.isDirectory()){
-            dirInput.file.eachFileRecurse {File file->
-                if(checkFileNamePass(file.getCanonicalPath())){
+        if (dirInput.file.isDirectory()) {
+            dirInput.file.eachFileRecurse { File file ->
+                if (checkFileNamePass(file.getCanonicalPath())) {
                     ClassReader classReader = new ClassReader(file.bytes)
-                    ClassWriter classWriter = new ClassWriter(classReader,ClassWriter.COMPUTE_MAXS)
-                    ClassVisitor  classVisitor = new SophixClassVisitor(classWriter,isDebug)
-                    classReader.accept(classVisitor,ClassWriter.COMPUTE_FRAMES)
+                    ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
+                    ClassVisitor classVisitor = new SophixClassVisitor(classWriter, isDebug)
+                    classReader.accept(classVisitor, ClassWriter.COMPUTE_FRAMES)
 
                     byte[] code = classWriter.toByteArray()
-                    FileOutputStream fos = new FileOutputStream(file.parentFile.absolutePath+File.separator+file.name)
+                    FileOutputStream fos = new FileOutputStream(file.parentFile.absolutePath + File.separator + file.name)
                     fos.write(code)
                     fos.close()
                 }
             }
         }
 
-        def dest = outputProvider.getContentLocation(dirInput.name,dirInput.contentTypes,dirInput.scopes,Format.DIRECTORY)
-        FileUtils.copyDirectory(dirInput.file,dest)
+        def dest = outputProvider.getContentLocation(dirInput.name, dirInput.contentTypes, dirInput.scopes, Format.DIRECTORY)
+        FileUtils.copyDirectory(dirInput.file, dest)
 
     }
 
-    public void handleJarInput(JarInput jarInput,TransformOutputProvider outputProvider){
+    public void handleJarInput(JarInput jarInput, TransformOutputProvider outputProvider) {
         //##to resolve the hotfix classes.jar file from group:articleId = com.aliyun.ams:alicloud-android-hotfix
-        if(jarInput.file.getAbsolutePath().endsWith(".jar")){
+        if (jarInput.file.getAbsolutePath().endsWith(".jar")) {
             def jarName = jarInput.name
             def md5Name = DigestUtils.md5Hex(jarInput.file.getAbsolutePath())
-            if(jarName.endsWith(".jar")){
-                jarName = jarName.substring(0,jarName.length()-4)
+            if (jarName.endsWith(".jar")) {
+                jarName = jarName.substring(0, jarName.length() - 4)
             }
             JarFile jarFile = new JarFile(jarInput.file)
             Enumeration enumeration = jarFile.entries()
             File tempFile = new File(jarInput.file.getParent() + File.separator + "classes_temp.jar")
-            if(tempFile.exists()){
+            if (tempFile.exists()) {
                 tempFile.delete()
             }
-            if(tempFile.exists()){
+            if (!tempFile.exists()) {
                 tempFile.createNewFile()
             }
             JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(tempFile))
-            enumeration.each { JarEntry jarEntry->
+            enumeration.each { JarEntry jarEntry ->
                 String entryName = jarEntry.getName()
                 ZipEntry zipEntry = new ZipEntry(entryName)
                 InputStream inputStream = jarFile.getInputStream(zipEntry)
-                if(checkFileNamePass(jarEntry.getName())){
+                if (checkFileNamePass(jarEntry.getName())) {
                     jarOutputStream.putNextEntry(zipEntry)
                     ClassReader classReader = new ClassReader(IOUtils.toByteArray(inputStream))
-                    ClassWriter classWriter = new ClassWriter(classReader,ClassWriter.COMPUTE_MAXS)
-                    ClassVisitor cv = new SophixClassVisitor(classWriter,isDebug)
-                    classReader.accept(cv,ClassReader.EXPAND_FRAMES)
+                    ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
+                    ClassVisitor cv = new SophixClassVisitor(classWriter, isDebug)
+                    classReader.accept(cv, ClassReader.EXPAND_FRAMES)
                     byte[] code = classWriter.toByteArray()
                     jarOutputStream.write(code)
-                }else{
+                } else {
                     jarOutputStream.putNextEntry(zipEntry)
                     jarOutputStream.write(IOUtils.toByteArray(inputStream))
                 }
@@ -161,22 +161,25 @@ class SophixPlugin extends Transform implements Plugin<Project>{
             jarOutputStream.close()
             jarFile.close()
 
-            def dest = outputProvider.getContentLocation(jarName+md5Name,jarInput.contentTypes,jarInput.scopes,Format.JAR)
-            FileUtils.copyFile(tempFile,dest)
+            def dest = outputProvider.getContentLocation(jarName + md5Name, jarInput.contentTypes, jarInput.scopes, Format.JAR)
+            FileUtils.copyFile(tempFile, dest)
+            if (tempFile != null && tempFile.exists()) {
+                tempFile.delete()
+            }
+
         }
 
     }
 
-    boolean checkFileNamePass(String fileName){
-        if(!fileName.startsWith("R\$")){
-            if(fileName.endsWith(".class")&&fileName.startsWith("com/taobao/sophix/a/c")&&fileName.equals("com/taobao/sophix/a/c.class")){
-                if (isDebug){
+    boolean checkFileNamePass(String fileName) {
+        if (!fileName.startsWith("R\$")) {
+            if (fileName.endsWith(".class") && fileName.startsWith("com/taobao/sophix/a/c") && fileName.equals("com/taobao/sophix/a/c.class")) {
+                if (isDebug) {
                     println("SophixPlugin: deal with jar class file path: $fileName")
                 }
                 return true
-            }
-            else if((fileName.endsWith(".java")||fileName.endsWith(".class"))&&fileName.startsWith("io/flutter/view/FlutterMain")){
-                if (isDebug){
+            } else if ((fileName.endsWith("FlutterMain.java") || fileName.endsWith("FlutterMain.class")) && fileName.startsWith("io/flutter/view/FlutterMain")) {
+                if (isDebug) {
                     println("SophixPlugin: deal with java file path: $fileName")
                 }
                 return true
