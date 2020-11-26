@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 
 
 /**
- * 利用反射sophix生成的flutter补丁，打进flutter的releaseMode aot加载流程中
+ * reflect FlutterLoader.aotSharedLibraryName method in android  releaseMode build
  * warning: debugMode is not supported
  */
 public class FlutterPatch {
@@ -48,8 +48,7 @@ public class FlutterPatch {
     }
 
     /**
-     * 插桩方法
-     * 此方法不可修改，否则不会成功
+     * #Do not correct this function
      * @param obj
      */
     public static void hook(Object obj) {
@@ -81,10 +80,8 @@ public class FlutterPatch {
     }
 
     /**
-     * Sophix 插桩方法，获取sophix so包路径
-     * <p>
-     * 此方法不可修改，否则不会成功
-     *
+     * #Do not correct this function
+     * get libsapp.so absolute path
      * @param obj
      */
     public static void hookSophix(Object obj) {
@@ -132,9 +129,7 @@ public class FlutterPatch {
     }
 
     /**
-     * Sophix 插桩方法，获取项目是否使用sophix
-     * <p>
-     * 此方法不可修改，否则不会成功
+     * now not in use
      */
     public static void hookIsUseSophix() {
         isUseSophix = true;
@@ -142,9 +137,8 @@ public class FlutterPatch {
     }
 
     /**
-     * Sophix 插桩方法，获取项目是否使用Tinker
+     * use in tinker
      * <p>
-     * 此方法不可修改，否则不会成功
      */
 //    public static void hookIsUseTinker() {
 //        isUseTinker = true;
@@ -190,8 +184,6 @@ public class FlutterPatch {
 //    }
 
     /**
-     * 获取最优abi
-     *
      * @return
      */
     public static String getCpuABI() {
